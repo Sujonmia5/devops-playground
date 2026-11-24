@@ -4,6 +4,7 @@
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
+    "types": ["node"],
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -14,7 +15,6 @@
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
 
-    "types": [],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],

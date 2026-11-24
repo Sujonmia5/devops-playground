@@ -2,11 +2,15 @@
   "name": "devops-playground",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "start": "dist/index.js",
+    "test": "vitest run",
+    "build": "tsc --noEmit false --outDir dist"
   },
   "devDependencies": {
+    "@types/node": "^26.6.6",
     "typescript": "^7.0.2",
     "vitest": "^5.1.1"
   }

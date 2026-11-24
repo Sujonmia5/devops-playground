@@ -40,7 +40,7 @@ jobs:
             ghcr.io/sujonmia5/devops-playground:prod
 
   deploy:
-    name: Deploy to hostinger VPS
+    name: Deploy to Hostinger VPS
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
@@ -48,11 +48,13 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        script: |
-          cd /opt/devops-playground
-          sed -i 's|image: ghcr.io/sujonmia5/devops-playground:.*|image: ghcr.io/sujonmia5/devops-playground:${{ needs.build-and-push.outputs.image_tag }}|' docker-compose.yml
-          docker compose pull
-          docker compose up -d
-          docker image prune -f
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/devops-playground
+            sed -i 's|image: ghcr.io/sujonmia5/devops-playground:.*|image: ghcr.io/sujonmia5/devops-playground:${{ needs.build-and-push.outputs.image_tag }}|' docker-compose.yml
+            docker compose pull
+            docker compose up -d
+            docker image prune -f
+
+#

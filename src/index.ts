@@ -10,7 +10,7 @@ const server = http.createServer((req, res) => {
     JSON.stringify({
       status: "ok",
       app: "devops-playground",
-      version: "1.0.2",
+      version: "1.0.5",
       discountedPrice: finalPrice,
     }),
   );

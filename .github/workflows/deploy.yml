@@ -1,0 +1,58 @@
+name: Build and Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    name: Build & Push Image
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.sha_short }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set short commit SHA
+        id: meta
+        run: echo "sha_short=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/sujonmia5/devops-playground:${{ steps.meta.outputs.sha_short }}
+            ghcr.io/sujonmia5/devops-playground:prod
+
+  deploy:
+    name: Deploy to hostinger VPS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          cd /opt/devops-playground
+          sed -i 's|image: ghcr.io/sujonmia5/devops-playground:.*|image: ghcr.io/sujonmia5/devops-playground:${{ needs.build-and-push.outputs.image_tag }}|' docker-compose.yml
+          docker compose pull
+          docker compose up -d
+          docker image prune -f
